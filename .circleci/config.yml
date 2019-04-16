@@ -97,7 +97,7 @@ jobs:
 
   integration_tests:
     <<: *linux_defaults
-    parallelism: 1
+    parallelism: 4
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -110,7 +110,14 @@ jobs:
           name: Test cli
           command: |
             export PATH="$GOBIN:$PATH"
-            make test_cli
+            export VERSION="$(git describe --tags --long | sed 's/v\(.*\)/\1/')"
+            export GO111MODULE=on
+            testcases=`sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/'`
+            for tclist in $(sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/' | circleci tests split --split-by=timings); do
+              tcs=$(echo tclist | tr ' ' '|')
+              echo Running go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
+              go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
+            done
 
   test_sim_gaia_nondeterminism:
     <<: *linux_defaults
