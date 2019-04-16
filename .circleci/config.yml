@@ -113,12 +113,12 @@ jobs:
             export VERSION="$(git describe --tags --long | sed 's/v\(.*\)/\1/')"
             export GO111MODULE=on
             testcases=`sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/'`
-            for tclist in $(sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/' | circleci tests split --split-by=timings); do
-              tcs=$(echo $tclist | tr ' ' '|')
-              echo $tcs
-              echo Running go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
-              go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
+            for tc in $(sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/' | circleci tests split --split-by=timings); do
+              tcs=$tcs'|'$tc
             done
+            echo $tcs
+            echo Running go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
+            go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
 
   test_sim_gaia_nondeterminism:
     <<: *linux_defaults
