@@ -67,7 +67,7 @@ jobs:
           command: |
             export PATH="$GOBIN:$PATH"
             make go-mod-cache
-            make build install
+            make install
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
@@ -106,6 +106,9 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
+      - run:
+          name: build
+          command: make build
       - run:
           name: Test cli
           command: |
