@@ -67,11 +67,12 @@ jobs:
           command: |
             export PATH="$GOBIN:$PATH"
             make go-mod-cache
-            make install
+            make build install
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+            - "/go/src/github.com/cosmos/cosmos-sdk/build"
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -106,9 +107,6 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run:
-          name: build
-          command: make build
       - run:
           name: Test cli
           command: |
