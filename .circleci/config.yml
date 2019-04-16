@@ -55,7 +55,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v2-{{ checksum "go.sum" }}
       - run:
           name: tools
           command: |
@@ -106,7 +106,7 @@ jobs:
       - *dependencies
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v2-{{ checksum "go.sum" }}
       - run:
           name: Test cli
           command: |
