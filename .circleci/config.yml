@@ -67,7 +67,7 @@ jobs:
           command: |
             export PATH="$GOBIN:$PATH"
             make go-mod-cache
-            make install
+            make build install
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
@@ -114,7 +114,7 @@ jobs:
             export GO111MODULE=on
             testcases=`sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/'`
             for tc in $(sed -n '/^func Test/p' ./cmd/gaia/cli_test/cli_test.go | sed 's/^func \(Test[a-zA-Z]\+\)(.*/\1/' | circleci tests split --split-by=timings); do
-              tcs=$tcs'|'$tc
+              tcs=$tc'|'$tcs
             done
             echo $tcs
             echo Running go test -mod=readonly -p 4 `go list ./cmd/gaia/cli_test/...` -tags=cli_test -run=^\(${tcs}\)\$
